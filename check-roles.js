@@ -1,3 +1,10 @@
+// This is the test case for the lambda function
+
+// {
+//   "userName": "xero-check-roles"
+// }
+
+
 console.log('Loading function');
 
 const aws = require('aws-sdk');
