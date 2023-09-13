@@ -8,6 +8,11 @@
 - Set up the .env file or configure the ACCESS_KEY through AWS CLI
   - AWS_ACCESS_KEY_ID=your_access_key
   - AWS_SECRET_ACCESS_KEY=your_secret_key 
+- Change the customised settings
+  - RoleName
+  - S3Name
+  - FirstPolicyName
+  - SecondPolicyName
 
 ## 2. How the code works (Step by Step):
 

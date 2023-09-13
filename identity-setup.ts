@@ -4,6 +4,14 @@ import { PutObjectRequest } from 'aws-sdk/clients/s3';
 // Initialize IAM and S3 constructors
 const iam = new AWS.IAM();
 const s3 = new AWS.S3();
+// Constants
+const NOT_FOUND = 'NotFound';
+const VERSION = "2012-10-17";
+// Customised Settings
+const RoleName = "XeroRole";
+const S3Name = "xero-assessment";
+const FirstPolicyName = "XeroFirstPolicy";
+const SecondPolicyName = "XeroSecondPolicy";
 
 // This function is used to create Policy ans will be assigned to the AWS account users
 const createPolicy = async (policyName: string, policyDocument: object): Promise<string> => {
@@ -23,7 +31,7 @@ const createUsersAndRole = async () => {
     }
 
     const requirements = {
-        Version: "2012-10-17",
+        Version: VERSION,
         Statement: [
             {
                 Effect: "Allow",
@@ -56,7 +64,7 @@ const storeToS3 = async (bucketName:string, config: object) => {
         await s3.headBucket({ Bucket: bucketName }).promise();
     } catch (error: any) {
         // If the bucket doesn't exist, create it
-        if (error.code === 'NotFound') {
+        if (error.code === NOT_FOUND) {
             await s3.createBucket({ Bucket: bucketName }).promise();
         } else {
             // If there's another error, throw it
@@ -78,7 +86,7 @@ const storeToS3 = async (bucketName:string, config: object) => {
 async function setupIAMConfiguration() {
     // Policies
     const firstPolicy = {
-        Version: "2012-10-17",
+        Version: VERSION,
         Statement: [
             {
                 Effect: "Allow",
@@ -97,7 +105,7 @@ async function setupIAMConfiguration() {
     };
 
     const secondPolicy = {
-        Version: "2012-10-17",
+        Version: VERSION,
         Statement: [
             {
                 Effect: "Deny",
@@ -108,18 +116,18 @@ async function setupIAMConfiguration() {
     };
 
     // Initialization the policies and role
-    const policy1Arn = await createPolicy('XeroFirstPolicy', firstPolicy);
-    const policy2Arn = await createPolicy('XeroSecondPolicy', secondPolicy);
+    const policy1Arn = await createPolicy(FirstPolicyName, firstPolicy);
+    const policy2Arn = await createPolicy(SecondPolicyName, secondPolicy);
     const roleArn = await createUsersAndRole();
 
     // Attach the policies to the role
     await iam.attachRolePolicy({
-        RoleName: 'XeroRole',
+        RoleName: RoleName,
         PolicyArn: policy1Arn
     }).promise();
 
     await iam.attachRolePolicy({
-        RoleName: 'XeroRole',
+        RoleName: RoleName,
         PolicyArn: policy2Arn
     }).promise();
 
@@ -130,7 +138,7 @@ async function setupIAMConfiguration() {
     };
 
     // Upload the config to the S3 bucket
-    await storeToS3("xero-assessment-prac", config);
+    await storeToS3(S3Name, config);
 };
 
 setupIAMConfiguration();
