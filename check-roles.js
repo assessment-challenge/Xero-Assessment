@@ -12,7 +12,7 @@ exports.handler = async (event) => {
 
     const assumableRoles = roles.Roles.filter((role) => {
         const trustRelationship = JSON.parse(decodeURIComponent(role.AssumeRolePolicyDocument));
-        return trustRelationship.Statement.some((stmt) => stmt.Effect === 'Allow' && stmt.Principal.AWS.includes(userName));
+        return trustRelationship.Statement.some((stmt) => stmt.Effect === 'Allow' && stmt.Principal.AWS && stmt.Principal.AWS.includes(userName));
     });
 
     const bucketName = 'xero-assessment';
